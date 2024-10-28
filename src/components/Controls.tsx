@@ -1,7 +1,16 @@
 import React from 'react';
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import { AudioLines, Waves, Circle, CircuitBoard, Combine } from "lucide-react";
+import { 
+  AudioLines, 
+  Waves, 
+  Circle, 
+  CircuitBoard, 
+  Combine,
+  Sparkles,
+  Orbit,
+  Vortex
+} from "lucide-react";
 
 interface ControlsProps {
   onAmplitudeChange: (value: number) => void;
@@ -48,7 +57,7 @@ const Controls = ({ onAmplitudeChange, onFrequencyChange, onVisualizationChange 
           <Button
             variant="outline"
             size="icon"
-            onClick={() => onVisualizationChange('audio')}
+            onClick={() => onVisualizationChange('fractal')}
             className="hover:bg-primary/20"
           >
             <AudioLines className="h-4 w-4" />
@@ -68,6 +77,30 @@ const Controls = ({ onAmplitudeChange, onFrequencyChange, onVisualizationChange 
             className="hover:bg-primary/20"
           >
             <CircuitBoard className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => onVisualizationChange('lissajous')}
+            className="hover:bg-primary/20"
+          >
+            <Orbit className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => onVisualizationChange('particles')}
+            className="hover:bg-primary/20"
+          >
+            <Sparkles className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => onVisualizationChange('vortex')}
+            className="hover:bg-primary/20"
+          >
+            <Vortex className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"

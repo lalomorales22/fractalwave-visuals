@@ -20,6 +20,18 @@ const CombinedVisualizer = ({ amplitude, frequency, visualizationType }: Combine
 
     let animationFrameId: number;
     let hue = 0;
+    let particles: Array<{ x: number; y: number; vx: number; vy: number; size: number }> = [];
+
+    // Initialize particles for particle effect
+    const initParticles = () => {
+      particles = Array.from({ length: 50 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 2,
+        vy: (Math.random() - 0.5) * 2,
+        size: Math.random() * 4 + 1
+      }));
+    };
 
     const drawWaves = (time: number) => {
       const points = 100;
@@ -31,12 +43,81 @@ const CombinedVisualizer = ({ amplitude, frequency, visualizationType }: Combine
         const x = (i / points) * canvas.width;
         const y = canvas.height / 2 + 
                  Math.sin(i * 0.05 + time) * (50 * amplitude/50) * Math.sin(time * 0.5) +
-                 Math.sin(i * 0.1 - time * (frequency/25)) * 30;
+                 Math.sin(i * 0.1 - time * (frequency/25)) * 30 +
+                 Math.cos(i * 0.15 + time * 2) * (20 * amplitude/50); // Added complexity
         
         if (i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       }
       ctx.stroke();
+    };
+
+    const drawLissajous = (time: number) => {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const size = Math.min(canvas.width, canvas.height) * 0.4;
+      
+      ctx.beginPath();
+      for (let t = 0; t < Math.PI * 20; t += 0.1) {
+        const x = centerX + Math.sin(t * frequency/25 + time) * Math.cos(t) * size/2;
+        const y = centerY + Math.sin(t * amplitude/25) * Math.sin(t) * size/2;
+        
+        if (t === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = `hsl(${hue}, 70%, 60%)`;
+      ctx.stroke();
+    };
+
+    const drawParticleEffect = (time: number) => {
+      particles.forEach((particle, i) => {
+        // Update particle position
+        particle.x += particle.vx * (frequency/50);
+        particle.y += particle.vy * (frequency/50);
+        
+        // Bounce off walls
+        if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
+        if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+        
+        // Draw particle
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size * (amplitude/50), 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${(hue + i * 5) % 360}, 70%, 60%, 0.8)`;
+        ctx.fill();
+        
+        // Connect nearby particles
+        particles.slice(i + 1).forEach(other => {
+          const dx = other.x - particle.x;
+          const dy = other.y - particle.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < 100) {
+            ctx.beginPath();
+            ctx.moveTo(particle.x, particle.y);
+            ctx.lineTo(other.x, other.y);
+            ctx.strokeStyle = `hsla(${hue}, 70%, 60%, ${1 - distance/100})`;
+            ctx.stroke();
+          }
+        });
+      });
+    };
+
+    const drawVortex = (time: number) => {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const maxRadius = Math.min(canvas.width, canvas.height) * 0.4;
+      
+      for (let r = 0; r < maxRadius; r += 5) {
+        const angle = (r * 0.1 + time * frequency/25) % (Math.PI * 2);
+        const x = centerX + Math.cos(angle) * r;
+        const y = centerY + Math.sin(angle) * r;
+        const size = (maxRadius - r) / maxRadius * 4 * (amplitude/50);
+        
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${(hue + r) % 360}, 70%, 60%, 0.8)`;
+        ctx.fill();
+      }
     };
 
     const drawFractal = (x: number, y: number, size: number, depth: number, time: number) => {
@@ -121,11 +202,21 @@ const CombinedVisualizer = ({ amplitude, frequency, visualizationType }: Combine
         case 'spiral':
           drawSpiral(time);
           break;
+        case 'lissajous':
+          drawLissajous(time);
+          break;
+        case 'particles':
+          drawParticleEffect(time);
+          break;
+        case 'vortex':
+          drawVortex(time);
+          break;
         default:
-          // Combined visualization
-          drawWaves(time);
-          drawCircular(time * 0.5);
-          drawSpiral(time * 0.3);
+          // Combined visualization with new effects
+          drawWaves(time * 0.7);
+          drawVortex(time * 0.3);
+          drawParticleEffect(time);
+          drawLissajous(time * 0.5);
       }
 
       hue = (hue + 0.5) % 360;
@@ -135,6 +226,7 @@ const CombinedVisualizer = ({ amplitude, frequency, visualizationType }: Combine
     const resizeCanvas = () => {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
+      initParticles(); // Reinitialize particles on resize
     };
 
     window.addEventListener('resize', resizeCanvas);
