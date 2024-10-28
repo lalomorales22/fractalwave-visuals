@@ -12,7 +12,7 @@ import {
   Loader2,
   ZoomIn,
   ZoomOut,
-  Function,
+  Binary,
   Sigma
 } from "lucide-react";
 
@@ -158,7 +158,7 @@ const Controls = ({
             onClick={() => onVisualizationChange('mandelbrot')}
             className="hover:bg-primary/20"
           >
-            <Function className="h-4 w-4" />
+            <Binary className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
