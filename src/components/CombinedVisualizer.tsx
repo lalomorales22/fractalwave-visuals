@@ -1,20 +1,30 @@
+```typescript
 import React, { useEffect, useRef, useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
+import { setupAudioAnalyser, getAudioData } from '@/utils/audioUtils';
 import { drawMandelbrot, drawJulia } from '@/utils/visualizationAlgorithms';
 
 interface CombinedVisualizerProps {
   amplitude: number;
   frequency: number;
   visualizationType: string;
+  isMicrophoneEnabled: boolean;
 }
 
-const CombinedVisualizer = ({ amplitude, frequency, visualizationType }: CombinedVisualizerProps) => {
+const CombinedVisualizer = ({ 
+  amplitude, 
+  frequency, 
+  visualizationType,
+  isMicrophoneEnabled 
+}: CombinedVisualizerProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
+  const [audioAnalyser, setAudioAnalyser] = useState<AnalyserNode | null>(null);
+  const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     setIsDragging(true);
@@ -40,13 +50,32 @@ const CombinedVisualizer = ({ amplitude, frequency, visualizationType }: Combine
   };
 
   useEffect(() => {
+    let animationFrameId: number;
+    
+    const setupMicrophone = async () => {
+      try {
+        const { analyser, stream } = await setupAudioAnalyser();
+        setAudioAnalyser(analyser);
+        setAudioStream(stream);
+      } catch (error) {
+        console.error('Error setting up microphone:', error);
+      }
+    };
+
+    if (isMicrophoneEnabled && !audioAnalyser) {
+      setupMicrophone();
+    } else if (!isMicrophoneEnabled && audioStream) {
+      audioStream.getTracks().forEach(track => track.stop());
+      setAudioAnalyser(null);
+      setAudioStream(null);
+    }
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let animationFrameId: number;
     let hue = 0;
     let particles: Array<{ x: number; y: number; vx: number; vy: number; size: number }> = [];
 
@@ -206,45 +235,138 @@ const CombinedVisualizer = ({ amplitude, frequency, visualizationType }: Combine
       ctx.stroke();
     };
 
+    const drawSpectrum = (ctx: CanvasRenderingContext2D, audioData: Uint8Array) => {
+      const width = ctx.canvas.width;
+      const height = ctx.canvas.height;
+      const barWidth = width / audioData.length;
+      
+      ctx.fillStyle = 'rgba(26, 26, 46, 0.1)';
+      ctx.fillRect(0, 0, width, height);
+      
+      audioData.forEach((value, index) => {
+        const percent = value / 255;
+        const barHeight = height * percent;
+        const hue = (index / audioData.length) * 360;
+        
+        ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
+        ctx.fillRect(
+          index * barWidth,
+          height - barHeight,
+          barWidth,
+          barHeight
+        );
+      });
+    };
+
+    const drawWaveform = (ctx: CanvasRenderingContext2D, audioData: Uint8Array) => {
+      const width = ctx.canvas.width;
+      const height = ctx.canvas.height;
+      
+      ctx.fillStyle = 'rgba(26, 26, 46, 0.1)';
+      ctx.fillRect(0, 0, width, height);
+      
+      ctx.beginPath();
+      ctx.strokeStyle = `hsl(${Date.now() * 0.05 % 360}, 70%, 60%)`;
+      ctx.lineWidth = 2;
+      
+      audioData.forEach((value, index) => {
+        const x = (index / audioData.length) * width;
+        const y = (value / 255) * height;
+        
+        if (index === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      });
+      
+      ctx.stroke();
+    };
+
     const animate = () => {
       ctx.fillStyle = 'rgba(26, 26, 46, 0.1)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       const time = Date.now() * 0.001;
 
-      switch (visualizationType) {
-        case 'waves':
-          drawWaves(time);
-          break;
-        case 'fractal':
-          drawFractal(canvas.width / 2, canvas.height / 2, 50, 4, time);
-          break;
-        case 'circular':
-          drawCircular(time);
-          break;
-        case 'spiral':
-          drawSpiral(time);
-          break;
-        case 'lissajous':
-          drawLissajous(time);
-          break;
-        case 'particles':
-          drawParticleEffect(time);
-          break;
-        case 'vortex':
-          drawVortex(time);
-          break;
-        case 'mandelbrot':
-          drawMandelbrot(ctx, canvas.width, canvas.height, zoom, pan.x, pan.y);
-          break;
-        case 'julia':
-          drawJulia(ctx, canvas.width, canvas.height, zoom, pan.x, pan.y);
-          break;
-        default:
-          drawWaves(time * 0.7);
-          drawVortex(time * 0.3);
-          drawParticleEffect(time);
-          drawLissajous(time * 0.5);
+      if (isMicrophoneEnabled && audioAnalyser) {
+        const audioData = getAudioData(audioAnalyser);
+        
+        switch (visualizationType) {
+          case 'spectrum':
+            drawSpectrum(ctx, audioData);
+            break;
+          case 'waveform':
+            drawWaveform(ctx, audioData);
+            break;
+          case 'waves':
+            drawWaves(time);
+            break;
+          case 'fractal':
+            drawFractal(canvas.width / 2, canvas.height / 2, 50, 4, time);
+            break;
+          case 'circular':
+            drawCircular(time);
+            break;
+          case 'spiral':
+            drawSpiral(time);
+            break;
+          case 'lissajous':
+            drawLissajous(time);
+            break;
+          case 'particles':
+            drawParticleEffect(time);
+            break;
+          case 'vortex':
+            drawVortex(time);
+            break;
+          case 'mandelbrot':
+            drawMandelbrot(ctx, canvas.width, canvas.height, zoom, pan.x, pan.y);
+            break;
+          case 'julia':
+            drawJulia(ctx, canvas.width, canvas.height, zoom, pan.x, pan.y);
+            break;
+          default:
+            drawWaves(time * 0.7);
+            drawVortex(time * 0.3);
+            drawParticleEffect(time);
+            drawLissajous(time * 0.5);
+        }
+      } else {
+        switch (visualizationType) {
+          case 'waves':
+            drawWaves(time);
+            break;
+          case 'fractal':
+            drawFractal(canvas.width / 2, canvas.height / 2, 50, 4, time);
+            break;
+          case 'circular':
+            drawCircular(time);
+            break;
+          case 'spiral':
+            drawSpiral(time);
+            break;
+          case 'lissajous':
+            drawLissajous(time);
+            break;
+          case 'particles':
+            drawParticleEffect(time);
+            break;
+          case 'vortex':
+            drawVortex(time);
+            break;
+          case 'mandelbrot':
+            drawMandelbrot(ctx, canvas.width, canvas.height, zoom, pan.x, pan.y);
+            break;
+          case 'julia':
+            drawJulia(ctx, canvas.width, canvas.height, zoom, pan.x, pan.y);
+            break;
+          default:
+            drawWaves(time * 0.7);
+            drawVortex(time * 0.3);
+            drawParticleEffect(time);
+            drawLissajous(time * 0.5);
+        }
       }
 
       hue = (hue + 0.5) % 360;
@@ -264,8 +386,11 @@ const CombinedVisualizer = ({ amplitude, frequency, visualizationType }: Combine
     return () => {
       window.removeEventListener('resize', resizeCanvas);
       cancelAnimationFrame(animationFrameId);
+      if (audioStream) {
+        audioStream.getTracks().forEach(track => track.stop());
+      }
     };
-  }, [amplitude, frequency, visualizationType, zoom, pan]);
+  }, [amplitude, frequency, visualizationType, zoom, pan, isMicrophoneEnabled]);
 
   return (
     <canvas 
@@ -284,3 +409,4 @@ const CombinedVisualizer = ({ amplitude, frequency, visualizationType }: Combine
 };
 
 export default CombinedVisualizer;
+```

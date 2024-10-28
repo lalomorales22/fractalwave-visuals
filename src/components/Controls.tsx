@@ -1,6 +1,7 @@
 import React from 'react';
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { 
   AudioLines, 
   Waves, 
@@ -14,15 +15,19 @@ import {
   ZoomOut,
   Binary,
   Sigma,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Mic
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface ControlsProps {
   onAmplitudeChange: (value: number) => void;
   onFrequencyChange: (value: number) => void;
   onVisualizationChange: (type: string) => void;
   onZoomChange: (value: number) => void;
+  onMicrophoneToggle: (enabled: boolean) => void;
   zoom: number;
+  isMicrophoneEnabled: boolean;
 }
 
 const Controls = ({ 
@@ -30,14 +35,43 @@ const Controls = ({
   onFrequencyChange, 
   onVisualizationChange,
   onZoomChange,
-  zoom 
+  onMicrophoneToggle,
+  zoom,
+  isMicrophoneEnabled
 }: ControlsProps) => {
+  const { toast } = useToast();
+
+  const handleMicrophoneToggle = async (checked: boolean) => {
+    try {
+      onMicrophoneToggle(checked);
+      toast({
+        title: checked ? "Microphone Enabled" : "Microphone Disabled",
+        description: checked ? "Visualizations will now react to your audio input" : "Audio input disabled"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Could not access microphone. Please check permissions.",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <div className="glass p-6 rounded-lg space-y-6">
       <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal className="h-5 w-5" />
-          <h3 className="text-lg font-semibold">Controls</h3>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <SlidersHorizontal className="h-5 w-5" />
+            <h3 className="text-lg font-semibold">Controls</h3>
+          </div>
+          <div className="flex items-center gap-2">
+            <Mic className="h-4 w-4" />
+            <Switch
+              checked={isMicrophoneEnabled}
+              onCheckedChange={handleMicrophoneToggle}
+            />
+          </div>
         </div>
         
         <div className="space-y-2">
@@ -131,27 +165,26 @@ const Controls = ({
             </Button>
           </div>
         </div>
-      </div>
 
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Visualization Type</h3>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => onVisualizationChange('waves')}
-            className="hover:bg-primary/20"
-          >
-            <Waves className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => onVisualizationChange('fractal')}
-            className="hover:bg-primary/20"
-          >
-            <AudioLines className="h-4 w-4" />
-          </Button>
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Visualization Type</h3>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => onVisualizationChange('waves')}
+              className="hover:bg-primary/20"
+            >
+              <Waves className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => onVisualizationChange('fractal')}
+              className="hover:bg-primary/20"
+            >
+              <AudioLines className="h-4 w-4" />
+            </Button>
           <Button
             variant="outline"
             size="icon"
@@ -216,6 +249,23 @@ const Controls = ({
           >
             <Sigma className="h-4 w-4" />
           </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => onVisualizationChange('spectrum')}
+              className="hover:bg-primary/20"
+            >
+              <AudioLines className="h-4 w-4" rotate={90} />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => onVisualizationChange('waveform')}
+              className="hover:bg-primary/20"
+            >
+              <Waves className="h-4 w-4" rotate={90} />
+            </Button>
+          </div>
         </div>
       </div>
     </div>

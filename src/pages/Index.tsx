@@ -8,6 +8,7 @@ const Index = () => {
   const [frequency, setFrequency] = useState(50);
   const [visualizationType, setVisualizationType] = useState('combined');
   const [zoom, setZoom] = useState(1);
+  const [isMicrophoneEnabled, setIsMicrophoneEnabled] = useState(false);
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -23,6 +24,7 @@ const Index = () => {
                 amplitude={amplitude}
                 frequency={frequency}
                 visualizationType={visualizationType}
+                isMicrophoneEnabled={isMicrophoneEnabled}
               />
             </div>
           </div>
@@ -33,7 +35,9 @@ const Index = () => {
               onFrequencyChange={setFrequency}
               onVisualizationChange={setVisualizationType}
               onZoomChange={setZoom}
+              onMicrophoneToggle={setIsMicrophoneEnabled}
               zoom={zoom}
+              isMicrophoneEnabled={isMicrophoneEnabled}
             />
           </div>
         </div>
