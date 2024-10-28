@@ -1,7 +1,7 @@
 import React from 'react';
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import { AudioLines, Waves, CircleWaveform } from "lucide-react";
+import { AudioLines, Waves, Circle } from "lucide-react";
 
 interface ControlsProps {
   onAmplitudeChange: (value: number) => void;
@@ -59,7 +59,7 @@ const Controls = ({ onAmplitudeChange, onFrequencyChange, onVisualizationChange 
             onClick={() => onVisualizationChange('circular')}
             className="hover:bg-primary/20"
           >
-            <CircleWaveform className="h-4 w-4" />
+            <Circle className="h-4 w-4" />
           </Button>
         </div>
       </div>
