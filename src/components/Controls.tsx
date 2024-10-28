@@ -13,7 +13,8 @@ import {
   ZoomIn,
   ZoomOut,
   Binary,
-  Sigma
+  Sigma,
+  SlidersHorizontal
 } from "lucide-react";
 
 interface ControlsProps {
@@ -34,54 +35,101 @@ const Controls = ({
   return (
     <div className="glass p-6 rounded-lg space-y-6">
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Amplitude</h3>
-        <Slider
-          defaultValue={[50]}
-          max={100}
-          step={1}
-          onValueChange={(value) => onAmplitudeChange(value[0])}
-          className="w-full"
-        />
-      </div>
-      
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Frequency</h3>
-        <Slider
-          defaultValue={[50]}
-          max={100}
-          step={1}
-          onValueChange={(value) => onFrequencyChange(value[0])}
-          className="w-full"
-        />
-      </div>
-
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Zoom</h3>
-        <div className="flex gap-2 items-center">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => onZoomChange(zoom - 0.1)}
-            className="hover:bg-primary/20"
-          >
-            <ZoomOut className="h-4 w-4" />
-          </Button>
+        <div className="flex items-center gap-2">
+          <SlidersHorizontal className="h-5 w-5" />
+          <h3 className="text-lg font-semibold">Controls</h3>
+        </div>
+        
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Amplitude</label>
           <Slider
-            value={[zoom]}
-            min={0.1}
-            max={5}
-            step={0.1}
-            onValueChange={(value) => onZoomChange(value[0])}
+            defaultValue={[50]}
+            max={100}
+            step={1}
+            onValueChange={(value) => onAmplitudeChange(value[0])}
             className="w-full"
           />
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => onZoomChange(zoom + 0.1)}
-            className="hover:bg-primary/20"
-          >
-            <ZoomIn className="h-4 w-4" />
-          </Button>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Frequency</label>
+          <Slider
+            defaultValue={[50]}
+            max={100}
+            step={1}
+            onValueChange={(value) => onFrequencyChange(value[0])}
+            className="w-full"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Speed</label>
+          <Slider
+            defaultValue={[50]}
+            max={100}
+            step={1}
+            className="w-full"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Intensity</label>
+          <Slider
+            defaultValue={[50]}
+            max={100}
+            step={1}
+            className="w-full"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Complexity</label>
+          <Slider
+            defaultValue={[50]}
+            max={100}
+            step={1}
+            className="w-full"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Color Shift</label>
+          <Slider
+            defaultValue={[50]}
+            max={100}
+            step={1}
+            className="w-full"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Zoom</label>
+          <div className="flex gap-2 items-center">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => onZoomChange(zoom - 0.1)}
+              className="hover:bg-primary/20"
+            >
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+            <Slider
+              value={[zoom]}
+              min={0.1}
+              max={5}
+              step={0.1}
+              onValueChange={(value) => onZoomChange(value[0])}
+              className="w-full"
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => onZoomChange(zoom + 0.1)}
+              className="hover:bg-primary/20"
+            >
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
