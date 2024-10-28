@@ -1,4 +1,3 @@
-```typescript
 import React, { useEffect, useRef, useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { drawMandelbrot, drawJulia } from '@/utils/visualizationAlgorithms';
@@ -285,4 +284,3 @@ const CombinedVisualizer = ({ amplitude, frequency, visualizationType }: Combine
 };
 
 export default CombinedVisualizer;
-```
