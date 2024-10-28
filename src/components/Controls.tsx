@@ -9,7 +9,7 @@ import {
   Combine,
   Sparkles,
   Orbit,
-  Vortex
+  Loader2
 } from "lucide-react";
 
 interface ControlsProps {
@@ -100,7 +100,7 @@ const Controls = ({ onAmplitudeChange, onFrequencyChange, onVisualizationChange 
             onClick={() => onVisualizationChange('vortex')}
             className="hover:bg-primary/20"
           >
-            <Vortex className="h-4 w-4" />
+            <Loader2 className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
