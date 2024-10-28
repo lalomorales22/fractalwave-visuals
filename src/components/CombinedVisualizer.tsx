@@ -1,4 +1,3 @@
-```typescript
 import React, { useEffect, useRef, useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { setupAudioAnalyser, getAudioData } from '@/utils/audioUtils';
@@ -409,4 +408,3 @@ const CombinedVisualizer = ({
 };
 
 export default CombinedVisualizer;
-```
