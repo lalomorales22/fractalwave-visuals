@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import WaveVisualizer from '@/components/WaveVisualizer';
-import FractalPattern from '@/components/FractalPattern';
+import CombinedVisualizer from '@/components/CombinedVisualizer';
 import Controls from '@/components/Controls';
 import { Toaster } from '@/components/ui/toaster';
 
 const Index = () => {
   const [amplitude, setAmplitude] = useState(50);
   const [frequency, setFrequency] = useState(50);
-  const [visualizationType, setVisualizationType] = useState('waves');
+  const [visualizationType, setVisualizationType] = useState('combined');
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -17,12 +16,13 @@ const Index = () => {
         </h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <div className="h-[400px] floating">
-              <WaveVisualizer />
-            </div>
-            <div className="h-[400px]">
-              <FractalPattern />
+          <div className="lg:col-span-2">
+            <div className="h-[800px] floating">
+              <CombinedVisualizer 
+                amplitude={amplitude}
+                frequency={frequency}
+                visualizationType={visualizationType}
+              />
             </div>
           </div>
           

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import { AudioLines, Waves, Circle } from "lucide-react";
+import { AudioLines, Waves, Circle, CircuitBoard, Combine } from "lucide-react";
 
 interface ControlsProps {
   onAmplitudeChange: (value: number) => void;
@@ -36,7 +36,7 @@ const Controls = ({ onAmplitudeChange, onFrequencyChange, onVisualizationChange 
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Visualization Type</h3>
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
             size="icon"
@@ -60,6 +60,22 @@ const Controls = ({ onAmplitudeChange, onFrequencyChange, onVisualizationChange 
             className="hover:bg-primary/20"
           >
             <Circle className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => onVisualizationChange('spiral')}
+            className="hover:bg-primary/20"
+          >
+            <CircuitBoard className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => onVisualizationChange('combined')}
+            className="hover:bg-primary/20"
+          >
+            <Combine className="h-4 w-4" />
           </Button>
         </div>
       </div>
