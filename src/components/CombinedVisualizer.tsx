@@ -6,6 +6,10 @@ import { drawMandelbrot, drawJulia } from '@/utils/visualizationAlgorithms';
 interface CombinedVisualizerProps {
   amplitude: number;
   frequency: number;
+  speed: number;
+  intensity: number;
+  complexity: number;
+  colorShift: number;
   visualizationType: string;
   isMicrophoneEnabled: boolean;
 }
@@ -13,6 +17,10 @@ interface CombinedVisualizerProps {
 const CombinedVisualizer = ({ 
   amplitude, 
   frequency, 
+  speed,
+  intensity,
+  complexity,
+  colorShift,
   visualizationType,
   isMicrophoneEnabled 
 }: CombinedVisualizerProps) => {
@@ -76,15 +84,20 @@ const CombinedVisualizer = ({
     if (!ctx) return;
 
     let hue = 0;
+    const hueShiftSpeed = colorShift / 50; // Normalize color shift speed
+    const baseSpeed = speed / 50; // Normalize animation speed
+    const particleCount = Math.floor(30 + (complexity / 2)); // Scale particle count with complexity
+    const particleSize = 1 + (intensity / 25); // Scale particle size with intensity
+
     let particles: Array<{ x: number; y: number; vx: number; vy: number; size: number }> = [];
 
     const initParticles = () => {
-      particles = Array.from({ length: 50 }, () => ({
+      particles = Array.from({ length: particleCount }, () => ({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 2,
-        vy: (Math.random() - 0.5) * 2,
-        size: Math.random() * 4 + 1
+        vx: (Math.random() - 0.5) * 2 * baseSpeed,
+        vy: (Math.random() - 0.5) * 2 * baseSpeed,
+        size: Math.random() * particleSize + 1
       }));
     };
 
@@ -286,7 +299,7 @@ const CombinedVisualizer = ({
       ctx.fillStyle = 'rgba(26, 26, 46, 0.1)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      const time = Date.now() * 0.001;
+      const time = Date.now() * 0.001 * baseSpeed;
 
       if (isMicrophoneEnabled && audioAnalyser) {
         const audioData = getAudioData(audioAnalyser);
@@ -368,7 +381,7 @@ const CombinedVisualizer = ({
         }
       }
 
-      hue = (hue + 0.5) % 360;
+      hue = (hue + hueShiftSpeed) % 360;
       animationFrameId = requestAnimationFrame(animate);
     };
 
@@ -389,7 +402,8 @@ const CombinedVisualizer = ({
         audioStream.getTracks().forEach(track => track.stop());
       }
     };
-  }, [amplitude, frequency, visualizationType, zoom, pan, isMicrophoneEnabled]);
+
+  }, [amplitude, frequency, speed, intensity, complexity, colorShift, visualizationType, isMicrophoneEnabled]);
 
   return (
     <canvas 

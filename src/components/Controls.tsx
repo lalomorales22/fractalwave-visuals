@@ -3,26 +3,19 @@ import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { 
-  AudioLines, 
-  Waves, 
-  Circle, 
-  CircuitBoard, 
-  Combine,
-  Sparkles,
-  Orbit,
-  Loader2,
-  ZoomIn,
-  ZoomOut,
-  Binary,
-  Sigma,
-  SlidersHorizontal,
-  Mic
+  AudioLines, Waves, Circle, CircuitBoard, Combine,
+  Sparkles, Orbit, Loader2, ZoomIn, ZoomOut,
+  Binary, Sigma, SlidersHorizontal, Mic
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface ControlsProps {
   onAmplitudeChange: (value: number) => void;
   onFrequencyChange: (value: number) => void;
+  onSpeedChange: (value: number) => void;
+  onIntensityChange: (value: number) => void;
+  onComplexityChange: (value: number) => void;
+  onColorShiftChange: (value: number) => void;
   onVisualizationChange: (type: string) => void;
   onZoomChange: (value: number) => void;
   onMicrophoneToggle: (enabled: boolean) => void;
@@ -32,7 +25,11 @@ interface ControlsProps {
 
 const Controls = ({ 
   onAmplitudeChange, 
-  onFrequencyChange, 
+  onFrequencyChange,
+  onSpeedChange,
+  onIntensityChange,
+  onComplexityChange,
+  onColorShiftChange,
   onVisualizationChange,
   onZoomChange,
   onMicrophoneToggle,
@@ -81,7 +78,6 @@ const Controls = ({
             max={100}
             step={1}
             onValueChange={(value) => onAmplitudeChange(value[0])}
-            className="w-full"
           />
         </div>
 
@@ -92,7 +88,6 @@ const Controls = ({
             max={100}
             step={1}
             onValueChange={(value) => onFrequencyChange(value[0])}
-            className="w-full"
           />
         </div>
 
@@ -102,7 +97,7 @@ const Controls = ({
             defaultValue={[50]}
             max={100}
             step={1}
-            className="w-full"
+            onValueChange={(value) => onSpeedChange(value[0])}
           />
         </div>
 
@@ -112,7 +107,7 @@ const Controls = ({
             defaultValue={[50]}
             max={100}
             step={1}
-            className="w-full"
+            onValueChange={(value) => onIntensityChange(value[0])}
           />
         </div>
 
@@ -122,7 +117,7 @@ const Controls = ({
             defaultValue={[50]}
             max={100}
             step={1}
-            className="w-full"
+            onValueChange={(value) => onComplexityChange(value[0])}
           />
         </div>
 
@@ -132,7 +127,7 @@ const Controls = ({
             defaultValue={[50]}
             max={100}
             step={1}
-            className="w-full"
+            onValueChange={(value) => onColorShiftChange(value[0])}
           />
         </div>
 

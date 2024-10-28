@@ -6,6 +6,10 @@ import { Toaster } from '@/components/ui/toaster';
 const Index = () => {
   const [amplitude, setAmplitude] = useState(50);
   const [frequency, setFrequency] = useState(50);
+  const [speed, setSpeed] = useState(50);
+  const [intensity, setIntensity] = useState(50);
+  const [complexity, setComplexity] = useState(50);
+  const [colorShift, setColorShift] = useState(50);
   const [visualizationType, setVisualizationType] = useState('combined');
   const [zoom, setZoom] = useState(1);
   const [isMicrophoneEnabled, setIsMicrophoneEnabled] = useState(false);
@@ -23,6 +27,10 @@ const Index = () => {
               <CombinedVisualizer 
                 amplitude={amplitude}
                 frequency={frequency}
+                speed={speed}
+                intensity={intensity}
+                complexity={complexity}
+                colorShift={colorShift}
                 visualizationType={visualizationType}
                 isMicrophoneEnabled={isMicrophoneEnabled}
               />
@@ -33,6 +41,10 @@ const Index = () => {
             <Controls
               onAmplitudeChange={setAmplitude}
               onFrequencyChange={setFrequency}
+              onSpeedChange={setSpeed}
+              onIntensityChange={setIntensity}
+              onComplexityChange={setComplexity}
+              onColorShiftChange={setColorShift}
               onVisualizationChange={setVisualizationType}
               onZoomChange={setZoom}
               onMicrophoneToggle={setIsMicrophoneEnabled}
