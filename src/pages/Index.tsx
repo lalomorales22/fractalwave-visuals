@@ -7,6 +7,7 @@ const Index = () => {
   const [amplitude, setAmplitude] = useState(50);
   const [frequency, setFrequency] = useState(50);
   const [visualizationType, setVisualizationType] = useState('combined');
+  const [zoom, setZoom] = useState(1);
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -31,6 +32,8 @@ const Index = () => {
               onAmplitudeChange={setAmplitude}
               onFrequencyChange={setFrequency}
               onVisualizationChange={setVisualizationType}
+              onZoomChange={setZoom}
+              zoom={zoom}
             />
           </div>
         </div>

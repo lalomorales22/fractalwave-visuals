@@ -1,5 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+```typescript
+import React, { useEffect, useRef, useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
+import { drawMandelbrot, drawJulia } from '@/utils/visualizationAlgorithms';
 
 interface CombinedVisualizerProps {
   amplitude: number;
@@ -10,6 +12,33 @@ interface CombinedVisualizerProps {
 const CombinedVisualizer = ({ amplitude, frequency, visualizationType }: CombinedVisualizerProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    setIsDragging(true);
+    setLastPos({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDragging) return;
+    
+    const dx = (e.clientX - lastPos.x) / (100 * zoom);
+    const dy = (e.clientY - lastPos.y) / (100 * zoom);
+    
+    setPan(prev => ({
+      x: prev.x + dx,
+      y: prev.y + dy
+    }));
+    
+    setLastPos({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -22,7 +51,6 @@ const CombinedVisualizer = ({ amplitude, frequency, visualizationType }: Combine
     let hue = 0;
     let particles: Array<{ x: number; y: number; vx: number; vy: number; size: number }> = [];
 
-    // Initialize particles for particle effect
     const initParticles = () => {
       particles = Array.from({ length: 50 }, () => ({
         x: Math.random() * canvas.width,
@@ -44,7 +72,7 @@ const CombinedVisualizer = ({ amplitude, frequency, visualizationType }: Combine
         const y = canvas.height / 2 + 
                  Math.sin(i * 0.05 + time) * (50 * amplitude/50) * Math.sin(time * 0.5) +
                  Math.sin(i * 0.1 - time * (frequency/25)) * 30 +
-                 Math.cos(i * 0.15 + time * 2) * (20 * amplitude/50); // Added complexity
+                 Math.cos(i * 0.15 + time * 2) * (20 * amplitude/50);
         
         if (i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
@@ -71,21 +99,17 @@ const CombinedVisualizer = ({ amplitude, frequency, visualizationType }: Combine
 
     const drawParticleEffect = (time: number) => {
       particles.forEach((particle, i) => {
-        // Update particle position
         particle.x += particle.vx * (frequency/50);
         particle.y += particle.vy * (frequency/50);
         
-        // Bounce off walls
         if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
         if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
         
-        // Draw particle
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size * (amplitude/50), 0, Math.PI * 2);
         ctx.fillStyle = `hsla(${(hue + i * 5) % 360}, 70%, 60%, 0.8)`;
         ctx.fill();
         
-        // Connect nearby particles
         particles.slice(i + 1).forEach(other => {
           const dx = other.x - particle.x;
           const dy = other.y - particle.y;
@@ -211,8 +235,13 @@ const CombinedVisualizer = ({ amplitude, frequency, visualizationType }: Combine
         case 'vortex':
           drawVortex(time);
           break;
+        case 'mandelbrot':
+          drawMandelbrot(ctx, canvas.width, canvas.height, zoom, pan.x, pan.y);
+          break;
+        case 'julia':
+          drawJulia(ctx, canvas.width, canvas.height, zoom, pan.x, pan.y);
+          break;
         default:
-          // Combined visualization with new effects
           drawWaves(time * 0.7);
           drawVortex(time * 0.3);
           drawParticleEffect(time);
@@ -226,7 +255,7 @@ const CombinedVisualizer = ({ amplitude, frequency, visualizationType }: Combine
     const resizeCanvas = () => {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
-      initParticles(); // Reinitialize particles on resize
+      initParticles();
     };
 
     window.addEventListener('resize', resizeCanvas);
@@ -237,18 +266,23 @@ const CombinedVisualizer = ({ amplitude, frequency, visualizationType }: Combine
       window.removeEventListener('resize', resizeCanvas);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [amplitude, frequency, visualizationType]);
+  }, [amplitude, frequency, visualizationType, zoom, pan]);
 
   return (
     <canvas 
       ref={canvasRef}
-      className="w-full h-full rounded-lg glass"
+      className="w-full h-full rounded-lg glass cursor-move"
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
       onClick={() => toast({ 
         title: "Visualization Active", 
-        description: "Adjust the controls to modify the patterns!" 
+        description: "Drag to pan, use controls to zoom!" 
       })}
     />
   );
 };
 
 export default CombinedVisualizer;
+```
