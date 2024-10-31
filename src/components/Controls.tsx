@@ -75,7 +75,8 @@ const Controls = ({
           <label className="text-sm font-medium">Amplitude</label>
           <Slider
             defaultValue={[50]}
-            max={100}
+            min={1}
+            max={200}  // Increased from 100
             step={1}
             onValueChange={(value) => onAmplitudeChange(value[0])}
           />
@@ -85,7 +86,8 @@ const Controls = ({
           <label className="text-sm font-medium">Frequency</label>
           <Slider
             defaultValue={[50]}
-            max={100}
+            min={1}
+            max={150}  // Increased from 100
             step={1}
             onValueChange={(value) => onFrequencyChange(value[0])}
           />
@@ -95,7 +97,8 @@ const Controls = ({
           <label className="text-sm font-medium">Speed</label>
           <Slider
             defaultValue={[50]}
-            max={100}
+            min={1}
+            max={200}  // Increased from 100
             step={1}
             onValueChange={(value) => onSpeedChange(value[0])}
           />
@@ -105,7 +108,8 @@ const Controls = ({
           <label className="text-sm font-medium">Intensity</label>
           <Slider
             defaultValue={[50]}
-            max={100}
+            min={1}
+            max={150}  // Increased from 100
             step={1}
             onValueChange={(value) => onIntensityChange(value[0])}
           />
@@ -115,7 +119,8 @@ const Controls = ({
           <label className="text-sm font-medium">Complexity</label>
           <Slider
             defaultValue={[50]}
-            max={100}
+            min={1}
+            max={200}  // Increased from 100
             step={1}
             onValueChange={(value) => onComplexityChange(value[0])}
           />
@@ -125,7 +130,8 @@ const Controls = ({
           <label className="text-sm font-medium">Color Shift</label>
           <Slider
             defaultValue={[50]}
-            max={100}
+            min={1}
+            max={300}  // Increased for more dramatic color changes
             step={1}
             onValueChange={(value) => onColorShiftChange(value[0])}
           />

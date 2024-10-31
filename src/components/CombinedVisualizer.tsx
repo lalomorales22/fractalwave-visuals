@@ -84,10 +84,10 @@ const CombinedVisualizer = ({
     if (!ctx) return;
 
     let hue = 0;
-    const hueShiftSpeed = colorShift / 50; // Normalize color shift speed
-    const baseSpeed = speed / 50; // Normalize animation speed
-    const particleCount = Math.floor(30 + (complexity / 2)); // Scale particle count with complexity
-    const particleSize = 1 + (intensity / 25); // Scale particle size with intensity
+    const hueShiftSpeed = colorShift / 25; // Increased color shift impact
+    const baseSpeed = speed / 35; // Better speed control
+    const particleCount = Math.floor(50 + (complexity)); // More particles
+    const particleSize = 2 + (intensity / 20); // Larger particles
 
     let particles: Array<{ x: number; y: number; vx: number; vy: number; size: number }> = [];
 
@@ -107,12 +107,14 @@ const CombinedVisualizer = ({
       ctx.strokeStyle = `hsl(${hue}, 70%, 60%)`;
       ctx.lineWidth = 2;
 
+      const waveAmplitude = (amplitude / 50) * 100; // Increased wave height
+      const waveFrequency = (frequency / 50) * 2; // Better frequency control
+
       for (let i = 0; i < points; i++) {
         const x = (i / points) * canvas.width;
         const y = canvas.height / 2 + 
-                 Math.sin(i * 0.05 + time) * (50 * amplitude/50) * Math.sin(time * 0.5) +
-                 Math.sin(i * 0.1 - time * (frequency/25)) * 30 +
-                 Math.cos(i * 0.15 + time * 2) * (20 * amplitude/50);
+                 Math.sin(i * 0.05 + time) * waveAmplitude * Math.sin(time * 0.5) +
+                 Math.sin(i * 0.1 - time * waveFrequency) * (waveAmplitude * 0.6);
         
         if (i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
@@ -139,6 +141,8 @@ const CombinedVisualizer = ({
 
     const drawParticleEffect = (time: number) => {
       particles.forEach((particle, i) => {
+        particle.vx *= (1 + (speed / 100));
+        particle.vy *= (1 + (speed / 100));
         particle.x += particle.vx * (frequency/50);
         particle.y += particle.vy * (frequency/50);
         
@@ -191,8 +195,8 @@ const CombinedVisualizer = ({
       ctx.strokeStyle = `hsl(${branchHue}, 70%, 60%)`;
       ctx.lineWidth = depth * 0.5;
 
-      const branches = Math.floor(3 + (amplitude / 20));
-      const newSize = size * (0.5 + (frequency / 200));
+      const branches = Math.floor(4 + (amplitude / 25)); // More dramatic branching
+      const newSize = size * (0.6 + (frequency / 150)); // Better size scaling
 
       for (let i = 0; i < branches; i++) {
         const branchAngle = (i * Math.PI * 2) / branches + time;
